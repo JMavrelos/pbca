@@ -1,0 +1,207 @@
+package gr.blackswamp.pbca.service;
+
+import android.app.Service;
+import android.content.Intent;
+import android.content.res.AssetFileDescriptor;
+import android.media.MediaPlayer;
+import android.os.IBinder;
+import android.support.annotation.Nullable;
+import android.util.Log;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+import gr.blackswamp.pbca.App;
+import gr.blackswamp.pbca.R;
+import gr.blackswamp.pbca.model.Punch;
+
+
+public class WorkoutService extends Service {
+    private static final String NAME = "workout_service";
+    public static final String TAG = App.NAMESPACE + NAME;
+    public static final String SERVICE_STATE_CHANGED = TAG + ".SERVICE_STATE_CHANGED";
+    public static final String REQUEST = TAG + ".REQUEST";
+    public static final String BROADCAST = TAG + ".BROADCAST";
+    private final MediaPlayer _player = new MediaPlayer();
+    private final Object _sync_token = new Object();
+    //region tags to use to communicate with the outside world
+    Random _rng;
+    private int _interval;
+    private int _repetitions;
+    private int _sets;
+    private PunchSets _punches;
+    private Thread _main_thread;
+    private boolean _working;
+    private WorkoutBroadcast _latest;
+    //endregion
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent == null) {
+            stopSelf();
+            return START_NOT_STICKY;
+        }
+        WorkoutRequest request = intent.getParcelableExtra(REQUEST);
+        if (request == null) {
+            stopSelf();
+            return START_NOT_STICKY;
+        }
+        switch (request.get_action()) {
+            case start_working:
+                start_working(request);
+                break;
+            case state:
+                if (_working)
+                    send_broadcast(new WorkoutBroadcast(WorkoutStatus.started));
+                else
+                    send_broadcast(new WorkoutBroadcast(WorkoutStatus.finished));
+                break;
+            case resend:
+                send_broadcast(_latest);
+                break;
+            case stop_working:
+                stop_working();
+                break;
+        }
+        return START_NOT_STICKY;
+    }
+
+    private synchronized void send_broadcast(final WorkoutBroadcast broadcast) {
+        if (broadcast != null && !broadcast.equals(_latest) && broadcast.get_status() == WorkoutStatus.working)
+            _latest = broadcast;
+        Intent i = new Intent(SERVICE_STATE_CHANGED);
+        i.putExtra(BROADCAST, broadcast);
+        sendBroadcast(i);
+    }
+
+    private void start_working(final WorkoutRequest data) {
+        if (data.get_sets() <= 0 || data.get_interval() < 0 || data.get_repetitions() < 0 || data.punches() == null || data.punches().size() == 0) {
+            send_broadcast(new WorkoutBroadcast(getString(R.string.service_error_parsing_input_data)));
+            return;
+        }
+        _interval = data.get_interval();
+        _repetitions = data.get_repetitions();
+        _sets = data.get_sets();
+        _punches = new PunchSets(data.is_alternate(), data.punches());
+        if (_main_thread == null || _main_thread.getState() == Thread.State.TERMINATED)
+            _main_thread = new Thread(this::do_work);
+        if (!_main_thread.isAlive())
+            _main_thread.start();
+    }
+
+    private void do_work() {
+        _working = true;
+        _rng = new Random(System.currentTimeMillis());
+        int reps = _repetitions;
+        send_broadcast(new WorkoutBroadcast(WorkoutStatus.started));
+        do {
+            Log.d(NAME, "do_work: repetition" + reps);
+            final List<Punch> to_throw = new ArrayList<>();
+            for (int cnt = 0; cnt < _sets; cnt++) {
+                final List<Punch> punches = _punches.next();
+                to_throw.add(punches.get(_rng.nextInt(punches.size())));
+            }
+            punch_selected(to_throw);
+
+            try {
+                Thread.sleep(_interval);
+            } catch (InterruptedException ignored) {
+            }
+            reps--;
+        } while (_working && (reps > 0 || _repetitions == 0));
+        _working = false;
+        send_broadcast(new WorkoutBroadcast(WorkoutStatus.finished));
+    }
+
+    private void punch_selected(final List<Punch> to_throw) {
+        List<Integer> punch_numbers = new ArrayList<>();
+        for (Punch punch : to_throw) {
+            punch_numbers.add(punch.get_number());
+        }
+        send_broadcast(new WorkoutBroadcast(punch_numbers));
+        for (Punch punch : to_throw) {
+            _player.setOnCompletionListener(this::playback_finished);
+
+            try {
+                AssetFileDescriptor file = getApplicationContext().getAssets().openFd(punch.get_file());
+                _player.setDataSource(file.getFileDescriptor(), file.getStartOffset(), file.getLength());
+                _player.prepare();
+                _player.start();
+                synchronized (_sync_token) {
+                    try {
+                        _sync_token.wait();
+                    } catch (InterruptedException ignored) {
+                        ignored.printStackTrace();
+                        return;
+                    }
+                }
+            } catch (IOException ignored) {
+                ignored.printStackTrace();
+            }
+
+        }
+    }
+
+    private void playback_finished(MediaPlayer mediaPlayer) {
+        synchronized (_sync_token) {
+            mediaPlayer.reset();
+            _sync_token.notify();
+        }
+    }
+
+
+    void send_error(final String message, final Exception e) {
+        Log.e("", e.getMessage(), e);
+        send_broadcast(new WorkoutBroadcast(message));
+    }
+
+    private void stop_working() {
+        _working = false;
+        if (_main_thread != null)
+            _main_thread.interrupt();
+        stopSelf();
+    }
+
+
+    static class PunchSets {
+        int _current = 2; //this way it will always trigger the reset on the first next loop
+        List<List<Punch>> _sets = new ArrayList<>();
+
+        PunchSets(boolean alternate, List<Punch> all_punches) {
+            if (!alternate) {
+                _sets.add(all_punches);
+            } else {
+                List<Punch> rights = new ArrayList<>();
+                List<Punch> lefts = new ArrayList<>();
+                for (Punch punch : all_punches) {
+                    if (punch.is_left()) {
+                        lefts.add(punch);
+                    } else {
+                        rights.add(punch);
+                    }
+                }
+                if (lefts.size() > 0)
+                    _sets.add(lefts);
+                if (rights.size() > 0)
+                    _sets.add(rights);
+            }
+        }
+
+        List<Punch> next() {
+            _current++;
+            if (_current >= _sets.size())
+                _current = 0;
+            return _sets.get(_current);
+        }
+
+    }
+
+}

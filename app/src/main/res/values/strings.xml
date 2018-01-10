@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">Punching Bag Companion App</string>
+    <string name="action_settings">Settings</string>
+    <string name="main_settings_text_alternate">Force Alternate Hands</string>
+    <string name="main_settings_text_punch_caption">Punches To Use</string>
+    <string name="main_settings_text_continuous">Continuous</string>
+    <string name="main_settings_text_interval">Interval (in ms)</string>
+    <string name="main_settings_button_interval_dec_100">-100</string>
+    <string name="main_settings_button_interval_dec_10">-10</string>
+    <string name="main_settings_button_interval_inc_10">+10</string>
+    <string name="main_settings_button_interval_inc_100">+100</string>
+    <string name="main_settings_text_sets">Sets</string>
+    <string name="main_settings_sets_caption">Number of punches per set:</string>
+    <string name="main_settings_text_repetitions_caption">Number of times to repeat each set(0=Infinite):</string>
+    <string name="punch_left_direct">Left Direct</string>
+    <string name="punch_right_direct">Right Direct</string>
+    <string name="punch_left_hook">Left Hook</string>
+    <string name="punch_right_hook">Right Hook</string>
+    <string name="punch_left_uppercut">Left Uppercut</string>
+    <string name="punch_right_uppercut">Right Uppercut</string>
+    <string name="main_error_updating_from_view">Error while retrieving parameters\nPlease try again</string>
+    <string name="main_error_saving_parameters">Error while saving parameter values\nPlease try again</string>
+    <string name="main_error_validation">%1$s</string>
+    <string name="service_error_parsing_input_data">Error parsing input data\nNot all variables have correct values</string>
+    <string name="main_error_invalid_number_of_punches">You must select at least one punch type before starting</string>
+</resources>

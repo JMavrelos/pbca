@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <declare-styleable name="DelayedAutoCompleteTextView">
+        <attr name="delay" format="integer" />
+        <attr name="progress" format="reference" />
+    </declare-styleable>
+
+    <declare-styleable name="NumberPicker">
+        <attr name="val" format="integer" />
+        <attr name="max" format="integer" />
+        <attr name="min" format="integer" />
+        <attr name="step" format="integer" />
+        <attr name="step_big" format="integer" />
+        <attr name="textSize" format="integer" />
+        <attr name="button_orientation" format="enum">
+            <enum name="horizontal" value="0" />
+            <enum name="vertical" value="1" />
+        </attr>
+        <attr name="view_orientation" format="enum">
+            <enum name="horizontal" value="0" />
+            <enum name="vertical" value="1" />
+        </attr>
+    </declare-styleable>
+
+
+    <attr name="drawableStartCompat" format="reference" />
+    <attr name="drawableEndCompat" format="reference" />
+    <attr name="drawableTopCompat" format="reference" />
+    <attr name="drawableBottomCompat" format="reference" />
+    <attr name="drawableTintCompat" format="color" />
+
+
+    <declare-styleable name="AppCompatDrawableTextView">
+        <attr name="drawableStartCompat" />
+        <attr name="drawableEndCompat" />
+        <attr name="drawableTopCompat" />
+        <attr name="drawableBottomCompat" />
+        <attr name="drawableTintCompat" />
+    </declare-styleable>
+
+    <declare-styleable name="AppCompatDrawableButton">
+        <attr name="drawableStartCompat" />
+        <attr name="drawableEndCompat" />
+        <attr name="drawableTopCompat" />
+        <attr name="drawableBottomCompat" />
+        <attr name="drawableTintCompat" />
+    </declare-styleable>
+</resources>
