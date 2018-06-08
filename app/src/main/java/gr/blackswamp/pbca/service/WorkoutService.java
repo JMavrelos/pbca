@@ -1,12 +1,16 @@
 package gr.blackswamp.pbca.service;
 
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.media.MediaPlayer;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.widget.RemoteViews;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,8 +28,12 @@ public class WorkoutService extends Service {
     public static final String SERVICE_STATE_CHANGED = TAG + ".SERVICE_STATE_CHANGED";
     public static final String REQUEST = TAG + ".REQUEST";
     public static final String BROADCAST = TAG + ".BROADCAST";
+    private static final int FOREGROUND_ID = 65;
+    private static final String CHANNEL_ID = TAG;
     private final MediaPlayer _player = new MediaPlayer();
     private final Object _sync_token = new Object();
+
+
     //region tags to use to communicate with the outside world
     Random _rng;
     private int _interval;
@@ -36,6 +44,7 @@ public class WorkoutService extends Service {
     private boolean _working;
     private WorkoutBroadcast _latest;
     //endregion
+
 
     @Nullable
     @Override
@@ -98,35 +107,70 @@ public class WorkoutService extends Service {
     }
 
     private void do_work() {
-        _working = true;
-        _rng = new Random(System.currentTimeMillis());
-        int reps = _repetitions;
-        send_broadcast(new WorkoutBroadcast(WorkoutStatus.started));
-        do {
-            Log.d(NAME, "do_work: repetition" + reps);
-            final List<Punch> to_throw = new ArrayList<>();
-            for (int cnt = 0; cnt < _sets; cnt++) {
-                final List<Punch> punches = _punches.next();
-                to_throw.add(punches.get(_rng.nextInt(punches.size())));
-            }
-            punch_selected(to_throw);
+        startForeground(FOREGROUND_ID, build_notification(""));
+        try {
+            _working = true;
+            _rng = new Random(System.currentTimeMillis());
+            int reps = _repetitions;
+            send_broadcast(new WorkoutBroadcast(WorkoutStatus.started));
+            do {
+                Log.d(NAME, "do_work: repetition" + reps);
+                final List<Punch> to_throw = new ArrayList<>();
+                for (int cnt = 0; cnt < _sets; cnt++) {
+                    final List<Punch> punches = _punches.next();
+                    to_throw.add(punches.get(_rng.nextInt(punches.size())));
+                }
+                punch_selected(to_throw);
 
-            try {
-                Thread.sleep(_interval);
-            } catch (InterruptedException ignored) {
-            }
-            reps--;
-        } while (_working && (reps > 0 || _repetitions == 0));
-        _working = false;
-        send_broadcast(new WorkoutBroadcast(WorkoutStatus.finished));
+                try {
+                    Thread.sleep(_interval);
+                } catch (InterruptedException ignored) {
+                }
+                reps--;
+            } while (_working && (reps > 0 || _repetitions == 0));
+            send_broadcast(new WorkoutBroadcast(WorkoutStatus.finished));
+        } finally {
+            _working = false;
+            stopForeground(true);
+        }
+
+    }
+
+    private Notification build_notification(String punch) {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID);
+
+        Intent stop_intent = new Intent(this, WorkoutService.class);
+        stop_intent.putExtra(REQUEST, new WorkoutRequest().set_action(WorkoutAction.stop_working));
+        PendingIntent pending_stop_intent = PendingIntent.getService(this, 0, stop_intent, PendingIntent.FLAG_UPDATE_CURRENT);
+//
+//        RemoteViews notification_view = new RemoteViews(getPackageName(), R.layout.notification);
+//        notification_view.setOnClickPendingIntent(R.id.notification_stop, pending_stop_intent);
+//        notification_view.setTextViewText(R.id.notification_title, punch);
+
+        builder.setOngoing(true)
+                .setOnlyAlertOnce(true)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle(getString(R.string.app_name))
+                .setContentText(getString(R.string.punching))
+                .addAction(R.drawable.ic_stop,getString(R.string.stop),pending_stop_intent);
+
+        //                .setCustomContentView(notification_view);
+
+
+        return builder.build();
     }
 
     private void punch_selected(final List<Punch> to_throw) {
         List<Integer> punch_numbers = new ArrayList<>();
-        for (Punch punch : to_throw) {
+        for (Punch punch : to_throw)
             punch_numbers.add(punch.get_number());
-        }
         send_broadcast(new WorkoutBroadcast(punch_numbers));
+
+        StringBuilder text = new StringBuilder();
+        for (Punch i : to_throw)
+            text.append(i).append(',');
+        startForeground(FOREGROUND_ID, build_notification(text.toString()));
+
         for (Punch punch : to_throw) {
             _player.setOnCompletionListener(this::playback_finished);
 

@@ -39,15 +39,10 @@ public class MainWorkFragment extends AttachedFragment<MainWorkFragment.WorkInte
     }
 
     @Override
-    protected void assign_views(boolean assign) {
-        if (assign) {
-            WorkViewHolder holder = new WorkViewHolder();
-            holder.data = find(R.id.main_work_data);
-            holder.fab = find(R.id.main_work_stop);
-            set_holder(holder);
-        } else {
-            set_holder(null);
-        }
+    protected void assign_views() {
+        set_holder(new WorkViewHolder());
+        holder().data = find(R.id.main_work_data);
+        holder().fab = find(R.id.main_work_stop);
     }
 
     @Override

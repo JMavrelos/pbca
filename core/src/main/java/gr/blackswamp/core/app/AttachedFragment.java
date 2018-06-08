@@ -2,9 +2,13 @@ package gr.blackswamp.core.app;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.view.View;
 
 public abstract class AttachedFragment<T extends CoreInteraction> extends CoreFragment {
     private T _parent;
+
     protected T parent() {
         return _parent;
     }
@@ -33,6 +37,4 @@ public abstract class AttachedFragment<T extends CoreInteraction> extends CoreFr
         super.onDetach();
         _parent = null;
     }
-
-
 }

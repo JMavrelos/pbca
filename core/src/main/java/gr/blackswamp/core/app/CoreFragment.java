@@ -26,6 +26,7 @@ public abstract class CoreFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
         _view = inflater.inflate(get_resource_layout_id(), container, false);
         assign_views(true);
         attach_listeners(true);
@@ -92,11 +93,21 @@ public abstract class CoreFragment extends Fragment {
     /**
      * assign views to the viewholder
      *
-     * @param assign if the views should be assigned
+     * @param assign if the views should be assigned or cleared
      */
-    protected void assign_views(final boolean assign) {
+    private void assign_views(final boolean assign) {
+        if (assign) {
+            assign_views();
+        } else {
+            set_holder(null);
+        }
     }
+    /**
+     * assign views to the viewholder
+     */
+    protected void assign_views() {
 
+    }
     /**
      * Will be called when the fragment needs to be notified that the back button was pressed
      */
@@ -109,7 +120,7 @@ public abstract class CoreFragment extends Fragment {
 
     public final <T extends Fragment> List<T> fragments(final Class<T> clazz) {
         List<T> children = new ArrayList<>();
-        if (this.isAdded())
+        if (!this.isAdded())
             return children;
         if (getChildFragmentManager().getFragments() == null)
             return children;

@@ -46,20 +46,15 @@ public class MainSettingsFragment extends AttachedFragment<MainSettingsFragment.
     }
 
     @Override
-    protected void assign_views(boolean assign) {
-        if (assign) {
-            SettingsViewHolder holder = new SettingsViewHolder();
-            holder.alternate = find(R.id.main_settings_alternate);
-            holder.punches = find(R.id.main_settings_punch);
-            holder.start = find(R.id.main_settings_start);
-            holder.sets = find(R.id.main_settings_sets);
-            holder.interval = find(R.id.main_settings_interval);
-            holder.repetitions = find(R.id.main_settings_repetitions);
-            holder.adapter = new PunchAdapter(parent().get_punches());
-            set_holder(holder);
-        } else {
-            set_holder(null);
-        }
+    protected void assign_views() {
+        set_holder(new SettingsViewHolder());
+        holder().alternate = find(R.id.main_settings_alternate);
+        holder().punches = find(R.id.main_settings_punch);
+        holder().start = find(R.id.main_settings_start);
+        holder().sets = find(R.id.main_settings_sets);
+        holder().interval = find(R.id.main_settings_interval);
+        holder().repetitions = find(R.id.main_settings_repetitions);
+        holder().adapter = new PunchAdapter(parent().get_punches());
     }
 
     @Override

@@ -1,5 +1,7 @@
 package gr.blackswamp.pbca.service;
 
+import android.util.SparseArray;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,7 +12,7 @@ public enum WorkoutStatus {
     finished(3),
     failure(4);
 
-    private static Map EnumMap = new HashMap();
+    private static SparseArray<WorkoutStatus> EnumMap = new SparseArray<>();
 
     static {
         for (WorkoutStatus workoutStatus : WorkoutStatus.values()) {
@@ -25,7 +27,7 @@ public enum WorkoutStatus {
     }
 
     public static WorkoutStatus valueOf(int value) {
-        return (WorkoutStatus) EnumMap.get(value);
+        return EnumMap.get(value);
     }
 
     public int value() {

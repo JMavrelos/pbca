@@ -9,7 +9,6 @@ import android.os.Build;
 import android.support.v7.content.res.AppCompatResources;
 import android.support.v7.widget.AppCompatButton;
 import android.util.AttributeSet;
-import android.view.Gravity;
 
 import gr.blackswamp.core.R;
 

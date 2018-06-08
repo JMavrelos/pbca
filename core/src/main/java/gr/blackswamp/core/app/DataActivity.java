@@ -1,6 +1,9 @@
 package gr.blackswamp.core.app;
+
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+
 import gr.blackswamp.core.functions.Supplier;
 
 public abstract class DataActivity<T extends DataFragment> extends CoreActivity {
@@ -11,16 +14,16 @@ public abstract class DataActivity<T extends DataFragment> extends CoreActivity 
         super(activity_resource_id, content_frame_resource_id);
         _constructor = fragment_constructor;
     }
+
     protected final T data() {
         return _data;
     }
 
     @Override
-    protected void post_create(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         init_data_fragment();
-        super.post_create(savedInstanceState);
     }
-
 
     private void init_data_fragment() {
         if (_data == null) {
@@ -33,13 +36,16 @@ public abstract class DataActivity<T extends DataFragment> extends CoreActivity 
                 _data = (T) frag;
             }
         }
+        _data._attached = this;
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if (isFinishing()){
+        if (isFinishing()) {
             getSupportFragmentManager().beginTransaction().remove(_data).commit();
+            if (_data != null)
+                _data._attached = null;
             _data = null;
         }
     }

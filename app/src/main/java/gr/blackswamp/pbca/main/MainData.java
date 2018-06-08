@@ -19,7 +19,6 @@ import gr.blackswamp.pbca.service.WorkoutService;
 
 
 public class MainData extends DataFragment {
-    WorkoutReceiver receiver = new WorkoutReceiver();
     UniAction<Intent> callback = this::got_broadcast;
 
     @Override
@@ -64,16 +63,13 @@ public class MainData extends DataFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        receiver.add_receiver(callback);
-        getContext().registerReceiver(receiver, new IntentFilter(WorkoutService.SERVICE_STATE_CHANGED));
+        App.RegisterReceiver(callback);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        receiver.remove_receiver(callback);
-        getContext().unregisterReceiver(receiver);
-
+        App.UregisterReceiver(callback);
     }
 
     private void got_broadcast(Intent intent) {

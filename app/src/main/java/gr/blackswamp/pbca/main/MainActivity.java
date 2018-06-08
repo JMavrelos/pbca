@@ -1,5 +1,7 @@
 package gr.blackswamp.pbca.main;
 
+import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 
 import java.util.ArrayList;
@@ -25,8 +27,9 @@ public class MainActivity extends DataActivity<MainData>
     }
 
     @Override
-    protected Fragment starting_fragment() {
-        return MainSettingsFragment.NewInstance();
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        show_fragment(MainSettingsFragment.NewInstance());
     }
 
     @Override
@@ -34,7 +37,6 @@ public class MainActivity extends DataActivity<MainData>
         super.onResume();
         data().ask_state();
     }
-
 
     //region settingsinteraction
     @Override
@@ -66,9 +68,9 @@ public class MainActivity extends DataActivity<MainData>
     public int get_repetitions() {
         return App.Settings().get_repetitions();
     }
-
     //endregion
     //region intaraction with the service
+
     @Override
     @SuppressWarnings("ConstantConditions")
     public void start_working() {
@@ -76,11 +78,11 @@ public class MainActivity extends DataActivity<MainData>
         try {
             //region Retrieve data from view
             error_id = R.string.main_error_updating_from_view;
-            boolean alternate = send(MainSettingsFragment.class, MainSettingsFragment::get_alternate);
-            List<Punch> punches = send(MainSettingsFragment.class, MainSettingsFragment::get_punches);
-            int interval = send(MainSettingsFragment.class, MainSettingsFragment::get_interval);
-            int repetitions = send(MainSettingsFragment.class, MainSettingsFragment::get_repetitions);
-            int sets = send(MainSettingsFragment.class, MainSettingsFragment::get_sets);
+            boolean alternate = retrieve(MainSettingsFragment.class, MainSettingsFragment::get_alternate);
+            List<Punch> punches = retrieve(MainSettingsFragment.class, MainSettingsFragment::get_punches);
+            int interval = retrieve(MainSettingsFragment.class, MainSettingsFragment::get_interval);
+            int repetitions = retrieve(MainSettingsFragment.class, MainSettingsFragment::get_repetitions);
+            int sets = retrieve(MainSettingsFragment.class, MainSettingsFragment::get_sets);
             //endregion
             //region validation
             error_id = R.string.main_error_validation;
@@ -106,9 +108,11 @@ public class MainActivity extends DataActivity<MainData>
     public void stop_working() {
         data().send_stop();
     }
+
     public void ask_for_current() {
         data().request_latest();
     }
+
     //endregion
     //region interaction with the data fragment
     public void service_started() {

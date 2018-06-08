@@ -5,7 +5,6 @@ import android.content.res.TypedArray;
 import android.support.annotation.LayoutRes;
 import android.support.constraint.ConstraintLayout;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -112,14 +111,8 @@ public class NumberPicker extends ConstraintLayout {
     }
 
 
-
     public void change_value(int val) {
         set_value(_value + val);
-    }
-
-    public void set_value(int val) {
-        _value = Math.max(_min, Math.min(_max, val));
-        update_value();
     }
 
     public void setOnValueChangedListener(OnValueChangedListener listener) {
@@ -135,6 +128,11 @@ public class NumberPicker extends ConstraintLayout {
 
     public int get_value() {
         return _value;
+    }
+
+    public void set_value(int val) {
+        _value = Math.max(_min, Math.min(_max, val));
+        update_value();
     }
 
     public interface OnValueChangedListener {

@@ -23,4 +23,6 @@
     <string name="main_error_validation">%1$s</string>
     <string name="service_error_parsing_input_data">Error parsing input data\nNot all variables have correct values</string>
     <string name="main_error_invalid_number_of_punches">You must select at least one punch type before starting</string>
+    <string name="punching">Keep Punching</string>
+    <string name="stop">Stop</string>
 </resources>
