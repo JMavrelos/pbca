@@ -1,11 +1,13 @@
 package gr.blackswamp.core.collections;
 
+import android.support.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 public class ObservableArrayList<T> extends ArrayList<T> implements ObservableList<T> {
-    final List<OnListChangedListener> listeners = new ArrayList<>();
+    private final List<OnListChangedListener> listeners = new ArrayList<>();
 
     @Override
     public void add_on_list_changed_listener(OnListChangedListener listener) {
@@ -39,7 +41,7 @@ public class ObservableArrayList<T> extends ArrayList<T> implements ObservableLi
     }
 
     @Override
-    public boolean addAll(Collection<? extends T> collection) {
+    public boolean addAll(@NonNull Collection<? extends T> collection) {
         int starting_size = size();
         boolean added = super.addAll(collection);
         if (added)
@@ -49,7 +51,7 @@ public class ObservableArrayList<T> extends ArrayList<T> implements ObservableLi
     }
 
     @Override
-    public boolean addAll(int index, Collection<? extends T> collection) {
+    public boolean addAll(int index, @NonNull Collection<? extends T> collection) {
         boolean added = super.addAll(index, collection);
         if (added)
             notify(ObservedChange.Added, index, collection.size());

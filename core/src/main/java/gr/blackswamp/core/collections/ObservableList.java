@@ -8,7 +8,7 @@ public interface ObservableList<T> extends List<T> {
 
     void clear_on_list_changed_listeners();
 
-    public interface OnListChangedListener {
+    interface OnListChangedListener {
         void has_changed(ObservedChange change, int start, int count);
     }
 }
