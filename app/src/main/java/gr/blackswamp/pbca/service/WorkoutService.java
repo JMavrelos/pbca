@@ -10,7 +10,6 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import android.widget.RemoteViews;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,6 +18,7 @@ import java.util.Random;
 
 import gr.blackswamp.pbca.App;
 import gr.blackswamp.pbca.R;
+import gr.blackswamp.pbca.main.MainActivity;
 import gr.blackswamp.pbca.model.Punch;
 
 
@@ -142,21 +142,20 @@ public class WorkoutService extends Service {
         Intent stop_intent = new Intent(this, WorkoutService.class);
         stop_intent.putExtra(REQUEST, new WorkoutRequest().set_action(WorkoutAction.stop_working));
         PendingIntent pending_stop_intent = PendingIntent.getService(this, 0, stop_intent, PendingIntent.FLAG_UPDATE_CURRENT);
-//
+
 //        RemoteViews notification_view = new RemoteViews(getPackageName(), R.layout.notification);
 //        notification_view.setOnClickPendingIntent(R.id.notification_stop, pending_stop_intent);
 //        notification_view.setTextViewText(R.id.notification_title, punch);
+
+        PendingIntent pendingActivityIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), PendingIntent.FLAG_CANCEL_CURRENT);
 
         builder.setOngoing(true)
                 .setOnlyAlertOnce(true)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle(getString(R.string.app_name))
                 .setContentText(getString(R.string.punching))
-                .addAction(R.drawable.ic_stop,getString(R.string.stop),pending_stop_intent);
-
-        //                .setCustomContentView(notification_view);
-
-
+                .setContentIntent(pendingActivityIntent)
+                .addAction(R.drawable.ic_stop, getString(R.string.stop), pending_stop_intent);
         return builder.build();
     }
 
@@ -182,13 +181,13 @@ public class WorkoutService extends Service {
                 synchronized (_sync_token) {
                     try {
                         _sync_token.wait();
-                    } catch (InterruptedException ignored) {
-                        ignored.printStackTrace();
+                    } catch (InterruptedException ie) {
+                        ie.printStackTrace();
                         return;
                     }
                 }
-            } catch (IOException ignored) {
-                ignored.printStackTrace();
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
             }
 
         }

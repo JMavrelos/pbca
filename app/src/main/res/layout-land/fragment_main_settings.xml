@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+    <CheckBox
+        android:id="@+id/main_settings_alternate"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/app_margin"
+        android:text="@string/main_settings_text_alternate"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/main_settings_punch_caption"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/app_margin"
+        android:text="@string/main_settings_text_punch_caption"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        app:layout_constraintEnd_toEndOf="@+id/main_settings_alternate"
+        app:layout_constraintStart_toEndOf="@+id/main_settings_sets_caption"
+        app:layout_constraintTop_toBottomOf="@+id/main_settings_alternate" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/main_settings_punch"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toTopOf="@+id/main_settings_start"
+        app:layout_constraintEnd_toEndOf="@+id/main_settings_punch_caption"
+        app:layout_constraintStart_toStartOf="@id/main_settings_punch_caption"
+        app:layout_constraintTop_toBottomOf="@+id/main_settings_punch_caption"
+        tools:items="6"
+        tools:listitem="@layout/list_item_punch" />
+
+    <TextView
+        android:id="@+id/main_settings_sets_caption"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/app_margin"
+        android:text="@string/main_settings_sets_caption"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        app:layout_constraintBottom_toTopOf="@+id/main_settings_sets"
+        app:layout_constraintEnd_toStartOf="@+id/main_settings_punch_caption"
+        app:layout_constraintStart_toStartOf="@+id/main_settings_alternate"
+        app:layout_constraintTop_toBottomOf="@id/main_settings_alternate" />
+
+    <gr.blackswamp.core.widgets.NumberPicker
+        android:id="@+id/main_settings_sets"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/main_settings_interval_caption"
+        app:layout_constraintEnd_toEndOf="@+id/main_settings_sets_caption"
+        app:layout_constraintStart_toStartOf="@+id/main_settings_sets_caption"
+        app:max="10"
+        app:min="1"
+        app:step="1"
+        app:step_big="10"
+        app:textSize="20"
+        app:val="1"
+        app:view_orientation="horizontal" />
+
+    <TextView
+        android:id="@+id/main_settings_interval_caption"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/app_margin"
+        android:text="@string/main_settings_text_interval"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        app:layout_constraintBottom_toTopOf="@+id/main_settings_interval"
+        app:layout_constraintEnd_toEndOf="@+id/main_settings_sets_caption"
+        app:layout_constraintStart_toStartOf="@+id/main_settings_sets_caption" />
+
+    <gr.blackswamp.core.widgets.NumberPicker
+        android:id="@+id/main_settings_interval"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:button_orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/main_settings_repetitions_caption"
+        app:layout_constraintEnd_toEndOf="@+id/main_settings_interval_caption"
+        app:layout_constraintStart_toStartOf="@+id/main_settings_interval_caption"
+        app:max="30000"
+        app:min="0"
+        app:step="100"
+        app:step_big="1000"
+        app:textSize="20"
+        app:val="500"
+        app:view_orientation="horizontal" />
+
+    <TextView
+        android:id="@+id/main_settings_repetitions_caption"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/app_margin"
+        android:text="@string/main_settings_text_repetitions_caption"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        app:layout_constraintBottom_toTopOf="@+id/main_settings_repetitions"
+        app:layout_constraintEnd_toEndOf="@+id/main_settings_interval_caption"
+        app:layout_constraintStart_toStartOf="@+id/main_settings_interval_caption" />
+
+
+    <gr.blackswamp.core.widgets.NumberPicker
+        android:id="@+id/main_settings_repetitions"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/app_margin"
+        app:button_orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/main_settings_start"
+        app:layout_constraintEnd_toEndOf="@+id/main_settings_repetitions_caption"
+        app:layout_constraintStart_toStartOf="@+id/main_settings_repetitions_caption"
+        app:max="100"
+        app:min="0"
+        app:step="1"
+        app:step_big="10"
+        app:textSize="20"
+        app:val="0"
+        app:view_orientation="horizontal" />
+
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/main_settings_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/app_margin"
+        android:tint="#fff"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/main_settings_alternate"
+        app:layout_constraintStart_toStartOf="@+id/main_settings_alternate"
+        app:srcCompat="@drawable/ic_play" />
+
+</android.support.constraint.ConstraintLayout>
